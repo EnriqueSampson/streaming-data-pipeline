@@ -1,5 +1,6 @@
 package com.labs1904.hwe.homework
 
+import com.labs1904.hwe.util.Util
 import java.time.Duration
 import java.util.{Arrays, Properties, UUID}
 import net.liftweb.json.DefaultFormats
@@ -9,6 +10,7 @@ import com.labs1904.hwe.util.Constants._
 import org.slf4j.LoggerFactory
 
 object KafkaHomework {
+
   private val logger = LoggerFactory.getLogger(getClass)
 
   /**
@@ -17,7 +19,7 @@ object KafkaHomework {
    */
 
     //TODO: If these are given in class, change them so that you can run a test. If not, don't worry about this step
-  val Topic: String = "change-me"
+//  val Topic: String = "connection-test"
 
   implicit val formats: DefaultFormats.type = DefaultFormats
 
@@ -25,23 +27,30 @@ object KafkaHomework {
 
     // Create the KafkaConsumer
     //TODO: Write in a comment what these lines are doing. What are the properties necessary to instantiate a consumer?
-    val properties = getProperties(BOOTSTRAP_SERVER)
+
+    // Retrieve Kafka consumer properties from a configuration file or environment variables
+    val properties = Util.getConsumerProperties(BOOTSTRAP_SERVER)
+    // Instantiate a new KafkaConsumer object with the specified key and value types and configuration properties
     val consumer: KafkaConsumer[String, String] = new KafkaConsumer[String, String](properties)
 
 
     //TODO: What does this line mean? Write your answer in a comment below
-    consumer.subscribe(Arrays.asList(Topic))
+
+//    This line of code is subscribing the Kafka consumer to a Kafka topic.
+    consumer.subscribe(Arrays.asList(DEFAULT_TOPIC))
 
     while (true) {
       // TODO: Change this to be every 5 seconds
-      val duration: Duration = Duration.ofMillis(100)
+      val duration: Duration = Duration.ofMillis(5000)
 
       //TODO: Look up the ConsumerRecords class below, in your own words what is the class designed to do?
+//      collections of consumer records, it returns records over that 5 second duration
       val records: ConsumerRecords[String, String] = consumer.poll(duration)
 
       records.forEach((record: ConsumerRecord[String, String]) => {
         // Retrieve the message from each record
         //TODO: Describe why we need the .value() at the end of record
+//        to just get the message and not the key, as its a key value pair
         val message = record.value()
 
         //TODO: If you were given the values for the bootstrap servers in class, run the app with the green play button and make sure it runs successfully. You should see message(s) printing out to the screen

@@ -36,6 +36,9 @@ object JSONConsumer {
           logger.info(s"Partition: ${record.partition}, Offset ${record.offset}")
         */
 
+        logger.info(s"Key: ${record.key}. Value: ${record.value}")
+        logger.info(s"Partition: ${record.partition}, Offset ${record.offset}")
+
         /*
           1. Retrieve and print the message from each record
           2. Define a case class,  at the top of this file, that matches the message structure ( https://docs.scala-lang.org/tour/case-classes.html )

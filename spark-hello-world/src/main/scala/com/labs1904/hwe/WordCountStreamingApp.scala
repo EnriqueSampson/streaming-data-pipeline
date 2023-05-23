@@ -1,5 +1,6 @@
 package com.labs1904.hwe
 
+import com.labs1904.hwe.WordCountBatchApp.splitSentenceIntoWords
 import org.apache.kafka.clients.producer.ProducerConfig
 import org.apache.kafka.common.serialization.StringSerializer
 import org.apache.log4j.Logger
@@ -17,9 +18,9 @@ object WordCountStreamingApp {
   val jobName = "WordCountStreamingApp"
   // TODO: define the schema for parsing data from Kafka
 
-  val bootstrapServer : String = "CHANGEME"
-  val username: String = "CHANGEME"
-  val password: String = "CHANGEME"
+  val bootstrapServer : String = "b-3-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196,b-2-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196,b-1-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196"
+  val username: String = "1904labs"
+  val password: String = "1904labs"
   val Topic: String = "word-count"
 
   //Use this for Windows
@@ -57,6 +58,18 @@ object WordCountStreamingApp {
         .selectExpr("CAST(value AS STRING)").as[String]
 
       sentences.printSchema
+      sentences.show()
+
+      val counts  = sentences.flatMap(sentence =>{
+        (splitSentenceIntoWords(sentence))
+      })
+
+      val wordsDF = counts.groupBy("value").count()
+      wordsDF.printSchema()
+      wordsDF.show()
+      wordsDF.foreach(wordCount=>println(wordCount))
+
+
 
       // TODO: implement me
       //val counts = ???
@@ -66,6 +79,13 @@ object WordCountStreamingApp {
         .format("console")
         .trigger(Trigger.ProcessingTime("5 seconds"))
         .start()
+//
+
+//
+//      val wordsDF = counts.groupBy("value").count()
+//      wordsDF.printSchema()
+//      wordsDF.show()
+//      wordsDF.foreach(wordCount=>println(wordCount))
 
       query.awaitTermination()
     } catch {
